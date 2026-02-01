@@ -4,7 +4,7 @@ A lightweight, real-time face recognition system optimized for embedded and edge
 
 **Pipeline:** Camera → Haar Detection → MediaPipe Landmarks → 5-Point Alignment → ArcFace Embeddings → Recognition
 
-The system prioritizes accuracy, speed, and modularity while maintaining a low computational footprint—perfect for edge AI applications.
+The system prioritizes accuracy, speed, and modularity while maintaining a low computational footprint—perfect for edge AI applications. 
 
 ---
 
