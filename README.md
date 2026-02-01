@@ -38,7 +38,7 @@ Get up and running in under 5 minutes:
 
 ```bash
 # 1. Clone or download the repository
-cd FaceLocking
+cd face-recognition-lock
 
 # 2. Create virtual environment
 python -m venv venv
@@ -111,7 +111,7 @@ Cosine Similarity + Visualization
 ## Project Structure
 
 ```
-FaceLocking/
+face-recognition-lock/
 ├── src/
 │   ├── __init__.py
 │   ├── embed.py              # Main pipeline: camera input → embeddings
