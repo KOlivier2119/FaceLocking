@@ -190,7 +190,7 @@ def main():
     lock = LockState()
     locked_embedding = db[target].reshape(-1).astype(np.float32)
 
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
     if not cap.isOpened():
         raise RuntimeError("Camera not available")
 

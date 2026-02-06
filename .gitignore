@@ -1,6 +1,14 @@
 data
 book
+
+# Python virtual environments
 .venv
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
 # Model auto-downloaded on first run (GitHub 100 MB limit)
 models/
 *.onnx
