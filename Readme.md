@@ -1,6 +1,8 @@
 # 🔐 FaceLocking
 ### Edge-Optimized ArcFace Recognition & Activity Tracking
 
+![FaceLocking Hero](https://images.unsplash.com/photo-1633513090164-b43840ea92f4?q=80&w=2070&auto=format&fit=crop)
+
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![ONNX Runtime](https://img.shields.io/badge/Inference-ONNX%20Runtime-green.svg)](https://onnxruntime.ai/)
