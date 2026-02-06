@@ -1,300 +1,123 @@
-# 🔐 FaceLocking: Edge ArcFace Face Recognition with 5-Point Alignment
+# 🔐 FaceLocking
+### Edge-Optimized ArcFace Recognition & Activity Tracking
 
-A lightweight, real-time face recognition system optimized for embedded and edge devices (Jetson Nano, Raspberry Pi, edge PCs). This project combines classical computer vision with modern deep learning to create an efficient, modular face recognition pipeline suitable for deployment in resource-constrained environments.
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![ONNX Runtime](https://img.shields.io/badge/Inference-ONNX%20Runtime-green.svg)](https://onnxruntime.ai/)
+[![MediaPipe](https://img.shields.io/badge/Landmarks-MediaPipe-red.svg)](https://mediapipe.dev/)
 
-**Pipeline:** Camera → Haar Detection → MediaPipe Landmarks → 5-Point Alignment → ArcFace Embeddings → Recognition
-
-The system prioritizes accuracy, speed, and modularity while maintaining a low computational footprint—perfect for edge AI applications. 
-
----
-
-## Table of Contents
-
-- [Quick Start](#quick-start)
-- [Key Features](#key-features)
-- [Why 5-Point Alignment?](#why-5-point-alignment)
-- [System Architecture](#system-architecture)
-- [Project Structure](#project-structure)
-- [Core Components](#core-components)
-  - [Face Detection (Haar Cascade)](#face-detection-haar-cascade)
-  - [Facial Landmark Detection (MediaPipe FaceMesh)](#facial-landmark-detection-mediapipe-facemesh)
-  - [5-Point Face Alignment](#5-point-face-alignment)
-  - [ArcFace Embedding (ONNX Runtime)](#arcface-embedding-onnx-runtime)
-  - [L2 Normalization & Similarity](#l2-normalization--similarity)
-- [Visualization & Demo Features](#visualization--demo-features)
-- [Requirements](#requirements)
-- [Installation & Run](#installation--run)
-- [Usage / Controls](#usage--controls)
-- [Target Use Cases](#target-use-cases)
-- [Roadmap / Future Improvements](#roadmap--future-improvements)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
+`FaceLocking` is a premium, real-time face recognition and tracking system engineered for the edge. It combines **ArcFace** deep embeddings with **MediaPipe** landmark detection to provide not just identity verification, but a persistent "lock-on" experience with integrated activity monitoring.
 
 ---
 
-## Quick Start
+## 📽️ The Experience
 
-Get up and running in under 5 minutes:
+The system is designed to "lock" onto a specific identity. Once locked:
+- **Persistent Tracking**: The system stays fixed on the target person even in a crowd.
+- **Action Detection**: Detects blinks, smiles, and head movements in real-time.
+- **Liveness Heuristics**: Passive monitoring of facial dynamics to ensure a "living" presence.
+- **Activity Logging**: Automatically records time-stamped actions to local history files.
 
+---
+
+## ✨ Key Features
+
+| Feature | Description |
+| :--- | :--- |
+| **🚀 Real-time Performance** | 15-30 FPS on standard CPUs (Jetson Nano/Raspberry Pi friendly). |
+| **🛡️ Robust Lock-On** | Sophisticated state management that tolerates brief occlusions or recognition drops. |
+| **🎯 5-Point Alignment** | Classical affine transformation to 112x112 for maximum ArcFace accuracy. |
+| **📊 Action Monitoring** | Heuristic-based detection of blinks, smiles, and directional look. |
+| **📦 Modular Design** | Clean separation between Detection, Alignment, Embedding, and State Logic. |
+
+---
+
+## 🛠️ System Architecture
+
+Our optimized pipeline ensures minimal latency while maintaining high precision:
+
+1.  **Capture**: High-speed camera frame acquisition via OpenCV.
+2.  **Detection**: Haar Cascade rough localization (CPU efficient).
+3.  **Refinement**: MediaPipe FaceMesh for high-fidelity 5-point landmark extraction.
+4.  **Normalization**: Affine transformation to a canonical 112x112 pose.
+5.  **Intelligence**: ArcFace (ONNX) generates a discriminative identity embedding.
+6.  **Comparison**: Cosine similarity against a lightweight local identity database.
+7.  **Lock Logic**: State-machine-based tracking and action recording.
+
+---
+
+## 🚀 Quick Start
+
+### 1. Environment Setup
 ```bash
-# 1. Clone or download the repository
+# Clone the repository
+git clone https://github.com/KOlivier2119/FaceLocking.git
 cd FaceLocking
 
-# 2. Create virtual environment
+# Create & activate virtual environment
 python -m venv venv
-venv\Scripts\activate  # Windows
-# source venv/bin/activate  # Linux/macOS
-
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Run the face recognition pipeline
-python -m src.embed
+source venv/bin/activate  # Linux/macOS
+# venv\Scripts\activate  # Windows
 ```
 
-> **Note:** Ensure `models/embedder_arcface.onnx` is in the models/ directory.
-
----
-
-## Project Overview
-
-The pipeline performs these steps in real-time:
-
-1. **Capture** frames from your camera
-2. **Detect** faces using Haar Cascade classifier
-3. **Extract** 5 facial landmarks with MediaPipe FaceMesh
-4. **Align** face to canonical 112×112 pose using affine transformation
-5. **Generate** identity embeddings using ArcFace ONNX model
-6. **Normalize** embeddings to unit length (L2 normalization)
-7. **Compute** cosine similarity and visualize results
-
-**Design Goals:** Minimal computational overhead, educational clarity, and modular architecture suitable for resource-constrained edge devices.
-
-## Key Features
-
-✨ **Real-time Performance** - Face detection and embedding generation at 15-30 FPS on edge hardware  
-🎯 **Accurate Alignment** - 5-point landmark-based affine alignment for stable, high-quality embeddings  
-⚡ **Lightweight** - Optimized for CPUs, no GPU required (though accelerated with CUDA/TensorRT if available)  
-📦 **Portable** - ONNX Runtime ensures compatibility across platforms (Windows, Linux, Jetson, Raspberry Pi)  
-🔍 **Debuggable** - Real-time visualization of detection, landmarks, aligned faces, and embeddings  
-🧩 **Modular** - Clean separation of concerns; easy to swap components or extend functionality
-
-## Why 5-Point Alignment?
-
-ArcFace and similar models expect consistently aligned, frontal faces. Using 5 landmarks (left eye, right eye, nose, left mouth corner, right mouth corner) allows us to:
-
-- Reduce pose variation
-- Normalize scale and rotation
-- Improve embedding stability and recognition accuracy
-- Keep computation minimal (important for embedded devices)
-
----
-
-## System Architecture
-
-Camera Frame  
-↓  
-Haar Face Detection  
-↓  
-MediaPipe FaceMesh (5-point extraction)  
-↓  
-5-Point Face Alignment (Affine Transform → 112×112)  
-↓  
-ArcFace ONNX Embedding (embedder_arcface.onnx)  
-↓  
-L2 Normalization  
-↓  
-Cosine Similarity + Visualization
-
----
-
-## Project Structure
-
-```
-FaceLocking/
-├── src/
-│   ├── __init__.py
-│   ├── embed.py              # Main pipeline: camera input → embeddings
-│   ├── recognize.py          # Face recognition and matching
-│   ├── enroll.py             # Enroll new users into database
-│   ├── evaluate.py           # Evaluate system performance
-│   ├── camera.py             # Camera capture abstraction
-│   ├── detect.py             # Face detection utilities
-│   ├── align.py              # Face alignment utilities
-│   ├── landmarks.py          # Landmark detection and extraction
-│   ├── lock.py               # Access control / locking logic
-│   ├── haar_5pt.py           # Haar detection + 5-point alignment
-│   └── __pycache__/          # Cached bytecode
-│
-├── models/                   # Pre-trained models directory
-│   └── embedder_arcface.onnx # ArcFace embedder (download required)
-│
-├── requirements.txt          # Python dependencies
-├── init_project.py           # Project initialization script
-├── fix_push_no_large_file.ps1 # Git LFS helper script
-└── README.md                 # This file
-```
-
-**Key Entry Points:**
-- `python -m src.embed` — Run real-time face embedding pipeline
-- `python -m src.enroll` — Enroll new faces into the system
-- `python -m src.recognize` — Perform face recognition on stored embeddings
-
----
-
-## Core Components
-
-### Face Detection (Haar Cascade)
-- Fast, classical detector (OpenCV)
-- Provides a rough bounding box for where to run the landmark detector
-- Low computational cost — ideal for real-time performance on edge devices
-
-### Facial Landmark Detection (MediaPipe FaceMesh)
-- High-precision landmark detector
-- From the full mesh only 5 key points are extracted
-- Provides stable landmark positions even with small head movements
-
-### 5-Point Face Alignment
-- Affine transformation that maps detected landmarks to a fixed template
-- Produces 112×112 aligned RGB face images required by ArcFace
-- Normalizes pose, scale, and rotation
-
-### ArcFace Embedding (ONNX Runtime)
-- Pretrained ArcFace model loaded via ONNX Runtime
-- Input: aligned 112×112 RGB face
-- Output: embedding vector (identity-preserving, discriminative)
-
-### L2 Normalization & Similarity
-- Embeddings are L2-normalized to unit length
-- Cosine similarity computed as dot(embedding_1, embedding_2)
-  - Values near 1.0 suggest the same identity
-  - Lower values suggest different identities
-
----
-
-## Visualization & Demo Features
-
-The demo includes:
-- Live face bounding box
-- 5-point landmark overlay
-- Real-time aligned face preview (112×112)
-- Embedding heatmap visualization
-- FPS counter
-- Real-time similarity display between consecutive frames
-
-These make the system both educational and debuggable.
-
----
-
-## Requirements
-
-- Python 3.10 or 3.11 (MediaPipe may be unstable on 3.12+)
-- See `requirements.txt` for exact packages. Typical dependencies include:
-  - opencv-python
-  - mediapipe
-  - onnxruntime
-  - numpy
-  - matplotlib (optional for heatmap visualization)
-
----
-
-## Installation & Run
-
-### Prerequisites
-- **Python 3.10 or 3.11** (MediaPipe may have stability issues on 3.12+)
-- A working camera or video file
-- Pre-trained ArcFace ONNX model
-
-### Setup Steps
-
-#### 1. Create Virtual Environment
-```bash
-python -m venv venv
-venv\Scripts\activate      # Windows
-# source venv/bin/activate  # Linux/macOS
-```
-
-#### 2. Install Dependencies
+### 2. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-**Typical dependencies include:**
-- `opencv-python` — Image capture and processing
-- `mediapipe` — Facial landmark detection
-- `onnxruntime` — Running the ArcFace model
-- `numpy` — Numerical computations
-- `matplotlib` (optional) — Heatmap visualization
-
-#### 3. Prepare ArcFace Model
-Obtain the `embedder_arcface.onnx` model and place it in the `models/` directory. Popular sources:
-- [InsightFace](https://github.com/deepinsight/insightface)
-- [ONNX Model Zoo](https://github.com/onnx/models)
-
-#### 4. Run the Demo
+### 3. Initialize & Run
 ```bash
-python -m src.embed
-```
+# Enroll your face (take pictures)
+python -m src.enroll
 
-A live window will appear showing:
-- ✓ Face detection bounding boxes
-- ✓ 5-point landmarks overlay
-- ✓ Aligned 112×112 face preview
-- ✓ Real-time FPS counter
-- ✓ Embedding similarity scores
+# Run the FaceLocking system
+python -m src.lock
+```
 
 ---
 
-## Usage / Controls
+## 🎮 Interactive Controls
 
-While the embedding pipeline is running:
+While the system is running, use these keys to interact:
 
 | Key | Action |
-|-----|--------|
-| **Q** | Quit the application |
-| **P** | Print embedding statistics and debug info to terminal |
-| **S** | Save current frame and embedding |
-
-**Troubleshooting:**
-- If the camera doesn't open, check camera permissions and try a different camera index
-- Adjust lighting for better face detection performance
-- Multiple faces are detected but only the largest is processed in the current version
+| :---: | :--- |
+| `Q` | **Quit** the application safely |
+| `L` | **Release Lock** manually to search for a new target |
+| `R` | **Reload DB** if you added new faces while running |
+| `S` | **Save** current frame and analytical data |
 
 ---
 
-## Target Use Cases
+## 📂 Project Structure
 
-- Embedded face recognition systems
-- Edge AI identity verification
-- Attendance and access control systems
-- Research and learning about face recognition pipelines
-
----
-
-## Roadmap / Future Improvements
-
-- Replace Haar with a lightweight CNN detector (for better multi-face robustness)
-- Add an embedding database + matching pipeline
-- Quantize ArcFace model for reduced power & faster inference
-- Support multi-face tracking
-- Hardware acceleration backends (TensorRT, NNAPI, etc.)
-- Packaging for specific platforms (Jetson, Raspberry Pi)
-
----
-
-## License
-
-This project is intended for educational and research purposes. See the `LICENSE` file for details. 
-
-**ONNX models may be subject to their own licenses—always review and comply with the licensing terms of pre-trained models you use.**
+```text
+FaceLocking/
+├── src/
+│   ├── lock.py           # 🧠 The Main Engine: State machine & Action Detection
+│   ├── enroll.py         # 👤 User enrollment and database creation
+│   ├── recognize.py      # 🔍 Core recognition & matching logic
+│   ├── embed.py          # ⚡ ArcFace ONNX embedder implementation
+│   ├── align.py          # 📐 Affine transformation & 5-point alignment
+│   └── landmarks.py      # 📍 Landmark extraction via MediaPipe
+├── data/
+│   ├── db/               # Generated identity embeddings (.npz)
+│   └── lock_history/     # Time-stamped activity logs (.txt)
+├── models/               # ArcFace ONNX model location
+└── requirements.txt      # Project dependencies
+```
 
 ---
 
-## Acknowledgments
+## 📈 Roadmap
 
-- ArcFace / InsightFace
-- MediaPipe
-- OpenCV
-- ONNX Runtime
+- [ ] **CNN Detection**: Swap Haar for a lightweight CNN (e.g., UltraFace) for better robustness.
+- [ ] **Hardware Acceleration**: native support for OpenVINO and TensorRT backends.
+- [ ] **Web Interface**: A modern dashboard for remote monitoring and history viewing.
+- [ ] **Multi-target Lock**: Ability to track and log multiple identities simultaneously.
 
 ---
+
+## 📄 License & Acknowledgments
+
+This project is licensed under the MIT License. Special thanks to the teams behind **ArcFace (InsightFace)**, **MediaPipe**, and **ONNX Runtime** for providing the core building blocks of modern edge AI.
